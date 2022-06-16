@@ -1,0 +1,358 @@
+//// Anum Aamir 
+//// @anum.as.codemply
+//// QUIZ GAME PROJECT
+
+#include <iostream>
+#include <conio.h>
+#include <windows.h>
+#include <fstream>
+using namespace std;
+
+char option, heart= 3;
+
+void StartScreen(); // starting screen 
+void Instructions(); // shows game instructions.. How to play?
+void MainMenu(); // Menu for selecting options
+void ChooseCategory(); // Menu for choosing Quiz category
+void ViewScores();
+
+void border(){
+	cout<<endl;
+	for (int i=1 ; i<90 ; i++){
+		printf("%c",177);
+	}
+}
+//// for displaying lives ////
+void showLives(int n){
+	for(int i=0; i<n; ++i){
+		cout<< heart<<" ";
+	}	
+}
+
+class node{
+public:                                                                                                                                                                                                                                                                                                                                                                                                                           
+	string ques; // Question
+	string op1, op2, op3, op4; // 4 Options
+	char correct; // Correct answer's option
+	node* next; //address of next question
+	node(){	}
+	node(string q, string a, string b, string c, string d, char ans){
+		ques= q, op1= a, op2= b, op3= c, op4= d, correct= ans;
+		next= NULL;
+	}
+};
+
+class linklist{
+	node *head, *current;
+public:
+	int lives, score;
+	linklist(){
+		current= head= NULL;
+		lives= 3;
+		score= 0;
+	}
+	////////// INSERT DATA //////////
+	void insert(string q, string a, string b, string c, string d, char ans){
+		node* newnode= new node(q,a,b,c,d,ans); 
+		if(head==NULL){ 
+			head= current= newnode;
+		}
+		else { 
+			newnode->next = current->next; 
+			current -> next= newnode; 
+			current = current -> next; 
+		}
+	}
+	////////// DISPLAY DATA //////////
+	void display(linklist& l){
+		node* temp= l.head;
+		char ans;
+		int no= 1;
+		
+		while(temp!= NULL && l.lives>0){
+			system("cls");
+			//// Showing Question and Options
+			cout<< "\nQuestion# "<< no<<"\t\t\t\t\tLives: ";
+			showLives(l.lives); cout<<endl;
+			border();
+			system("Color F9"); //background: white, text: Light Blue
+			cout<< endl<<endl<< temp->ques<< endl<<endl;
+			cout<< "\ta. "<<temp->op1<< "\t\t"<< "b. "<<temp->op2<<endl;
+			cout<< "\tc. "<<temp->op3<< "\t\t"<< "d. "<<temp->op4<<endl;
+			border();
+			
+			//// Choosing and Checking Answer
+			cout<< " \n\nChoose your answer (a/b/c/d): ";
+			while(1){
+				ans= getch();
+				if(ans=='a'|| ans=='b'||ans=='c'||ans=='d')
+					break;
+				cout<< "\n\tYOU ENTERED INVALID INPUT! Choose again: ";
+			} 
+			
+			if(ans== temp->correct){
+				++l.score;
+				system("Color FA"); //green color
+				cout<< "\n\n CORRECT ANSWER!\n";
+				getch();
+			}
+			else{
+				system("Color F4"); //red color
+				cout<< "\n\n WRONG ANSWER! Correct option is: "<< temp->correct<< endl;
+				getch();
+				system("cls");
+				border(); cout<< "\n\n\n\n\t\t\tLIVES: "; showLives(l.lives); cout<<"\n\n\n\n"; border();
+				Sleep(1000); system("cls");
+				border(); cout<< "\n\n\n\n\t\t\tLIVES: "; showLives(--l.lives); cout<<"\n\n\n\n";  border(); 
+				Sleep(1000);
+			}
+			system("cls");
+			temp= temp->next;
+			no++;
+		}
+		system("Color F0");
+		system("cls");
+		border();
+		if(l.lives==0)
+			cout<< "\n\n\tGAME OVER!  YOU ARE OUT LIVES!\n\n";
+		else
+			cout<< "ALL QUESTIONS ARE ANSWERED!\n\n ";
+		
+		cout<< "CALCULATING SCORES... ";
+		Sleep(2000);
+		system("cls");
+		border();
+		system("Color FD"); //pink
+		cout<< "\n\n\n\t YOU SCORED "<< l.score<< " MARKS\n\n";
+		if(l.score>=15) cout<< "\t BRILLIANT!\n\n\n";
+		else if(l.score >=10) cout<< "\t VERY GOOD!\n\n\n";
+		else if(l.score>=5) cout<< "\t KEEP IT UP!\n\n\n";
+		else cout<< "\t NEED IMPROVEMENT!\n\n\n";
+		border();
+		cout<< "\nReturn to Main Menu ";
+		getch();
+		system("Color F0");
+		system("cls");
+		
+		//// saving scores in a file
+		saveScores(l);
+	}
+	
+	void saveScores(linklist l){
+		fstream score;
+		score.open("quizscores.dat", ios::app);
+		if(option=='1')
+			score<< "Data Structures: \t"<< l.score<<"\n";
+		else if(option=='2')
+			score<< "Object Oriented Programming: \t"<< l.score<<"\n";
+		else
+			score<< "Programming Fundamentals: \t"<< l.score<<"\n";
+	}
+};
+
+class DataStructures{
+	linklist DS;
+public:
+	void setData(){
+		DS.insert("What data structure is used for breadth first traversal of a graph?","Queue","Stack","List","None of the above",'a');
+		DS.insert("Maximum degree of any vertex in a simple graph of vertices n is","2n-1","n+1","n","n-1",'d');
+		DS.insert("Which of the below mentioned sorting algorithms are not stable?","Selection sort","Bubble sort","Insertion sort","Merge sort",'a');
+		DS.insert("Linked list search complexity is","O(1)","O(n)","O(log n)","O(log log n)",'b');
+		DS.insert("Worst Case Time complexity of Quick sort is","O(log n)","O(n)","O(n^2)","O(n log n)",'c');
+		DS.insert("A pivot element to partition unsorted list is used in","Merge sort","Quick sort","Insertion sort","Selection sort",'b');
+		DS.insert("The worst case complexity of binary search matches with","Linear search","Interpolation search","Merge sort","None of the above",'a');
+		DS.insert("What is the minimum number of nodes that a binary tree can have?","Zero","One","Two","Three",'c');
+		DS.insert("What is the minimum number of queues needed when implementing a priority queue?","Three","Two","Five","One",'b');
+		DS.insert("Stack is","LIFO","FIFO","LCFO","None of the above",'a');
+		DS.insert("An array can be accessed by referring to","Value","Address","Index","Pointer",'c');
+		DS.insert("Which data structure is a linear data structure?","Trees","Array","Graph","All of the above",'b');
+		DS.insert("Given a hash table T with 25 slots that stores 2000 elements, the load factor a for T is","800","9.7","120","80",'d');
+		DS.insert("Any node is the path from the root to the node is called","Ancestor node","Successor node","Internal node","None",'a');
+		DS.insert("Which of the following is not the type of queue?","Priority queue","Circular queue","Single ended queue","Double ended queue",'c');
+		DS.insert("A graph is a collection of nodes, called ...... And line segments called ...... that connect pair of nodes","vertices,path","vertices,edges","graph node,edges","edges,vertices",'b');
+		DS.insert("A hash function h defined h(key)=key mod 7, with linear probing, is used to insert the keys 44, 45, 79, 55, 91, 18, 63 into a table indexed from 0 to 6. What will be the location of key 18?","3","4","5","6",'c');
+		DS.insert("In the ....... traversal we process all of a vertex’s descendants before we move to an adjacent vertex","Breadth First","Depth First","Width First","Depth Limited",'b');
+		DS.insert("To represent hierarchical relationship between elements, Which data structure is suitable?","Graph","Array","Tree","Priority",'c');
+		DS.insert("Which of the following data structure can’t store the nonhomogeneous data elements?","Arrays","Stack","Record","None of the above",'a');
+	}
+	
+	void askQuestions(){
+		DS.display(DS);
+		DS.lives= 3; DS.score= 0;
+	}
+	
+} ds;
+
+class ObjectOriented{
+	linklist OOP;
+public:
+	void setData(){
+		OOP.insert("Which of the following best defines a class?","Parent of an object","Instance of an object","Blueprint of an object","Scope of an object",'c');
+		OOP.insert("What is the additional feature in classes that was not in structures?","Data members","Access specifiers","Static data allowed","Member functions",'d');
+		OOP.insert("Which is not feature of OOP in general definitions?","Code reusability","Modularity","Duplicate data","Efficient code",'c');
+		OOP.insert("Which Feature of OOP illustrated the code reusability?","Inheritance","Polymorphism","Abstraction","Encapsulation",'a');
+		OOP.insert("In case of using abstract class, which function is supposed to be called first?","Local function","Function with highest priority","Global function","Function with lowest priority",'b');
+		OOP.insert("Which among the following can’t be used for polymorphism?","Static member functions","Member functions overloading","Predefined operator overloading","Constructor overloading",'a');
+		OOP.insert("Class is _________ abstraction","Object","Logical","Real","Hypothetical",'b');
+		OOP.insert("The object can’t be","Passed by reference","Passed by value","Passed by copy","Passed as function",'d');
+		OOP.insert("How many types of constructors are available, in general, in any language?","2","3","4","5",'b');
+		OOP.insert("Which constructor is called while assigning some object with another?","Default","Parameterized","Copy","Direct assignment used",'c');
+		OOP.insert("Which specifier applies only to the constructors?","private","public","static","protected",'b');
+		OOP.insert("How members of an object are accessed?","Using dot operator","Using scope resolution operator","Using member names directly","Using pointer only",'a');
+		OOP.insert("How many types of access specifiers are provided in OOP (C++)?","1","2","3","4",'c');
+		OOP.insert("Which specifier allows a programmer to make the private members which can be inherited?","Public","Protected","Private","Default",'b');
+		OOP.insert("Which specifier should be used for member functions of a class?","Private","Protected","Default","Public",'d');
+		OOP.insert("What happens if non static members are used in static member function?","Run-time error","Compile-time error","Executes fine","Executes if that function is not used",'b');
+		OOP.insert("Which member function doesn’t require any return type?","Static","Constructor","Constructor and Destructor","Const",'c');
+		OOP.insert("How many classes should a program contain to implement the multiple inheritance?","Only 1","Atleast 1","Atleast 3","Exactly 3",'c');
+		OOP.insert("If base class contains 2 nested classes, will it be possible to implement single level inheritance?","Yes, always","No, never","Yes, only if derived class also have nested classes"," No, it will use more than 2 classes which is wrong",'a');
+		OOP.insert("What is the keyword used to make data members public?","Public","Private","Protected,","Explicit",'a');
+	}
+	
+	void askQuestions(){
+		OOP.display(OOP);
+		OOP.lives= 3; OOP.score= 0;	
+	}
+	
+} oop;
+
+class Fundamentals{
+	linklist PF;
+		
+public:
+	void setData(){
+		PF.insert("Which of the following is NOT a type of algorithm?","Program","Flowchart","Pseudocode","Decision Table",'a');
+		PF.insert("The symbol that represents comments in a flowchart is","Procedure symbol","Annotation symbol","Flowline","Subroutine",'b');
+		PF.insert("In a flowchart the symbol that represents a condition based on which a decision should be made is","Procedure","Subroutine","Decision","Process",'c');
+		PF.insert("_______ represent algorithms that involve complex decision-making","Flowchart","Decision table","Program","Pseudocode",'b');
+		PF.insert("The accept keyword in a pseudocode is similar to the _______ symbol in a flowchart","Input","Output","Decision","Process",'a');
+		PF.insert("How would you declare a variable to store the gender of a person?","char n gender","string gender","char gender","int gender",'c');
+		PF.insert("A nAge variable is declared to store the age of a person. How would you intialize the variable to 25?","25= nAge","nAge= '25'","nAge= 25","Input nAge",'c');
+		PF.insert("A variable used to store the price of an item is to be declared. Which of the following declares the variable and intializes it to 15000.50?","int p= 15000.50","char p= 15000.50","double p= 15000","double p= 15000.50",'d');
+		PF.insert("Which of the following is a valid variable name?","n name","name123","n_name","n.name",'c');
+		PF.insert("In the following expression z = x + y , x and y are called","Operators","Operands","Values","Literals",'b');
+		PF.insert("Which operators are used to test the relationship between two variables or between a variable and a constant?","Logical operators","Arithmetic operators","Relational operators","Special operators",'c');
+		PF.insert("Which of the following is a logical operator?",">=","!","AND","+",'c');
+		PF.insert("If an expression contains an addition operator, a less than operator, and a division operator, which operator has a higher priority when evaluating the expression?","Addition","Division","Less than","All three",'b');
+		PF.insert("If x=2 NOT x=3 will result in","True","False","1","Both A and C",'d');
+		PF.insert("Which operator has the highest precedence level?","AND","*","()","!",'c');
+		PF.insert("What will be the result of 7 % 10?","10","0","7","1",'c');
+		PF.insert("To repeat data in some sequence, what is used?","Array","Loop","Condition","Function",'b');
+		PF.insert("Array stores a collection of data of","Different types","Same type","Only store one data","None of the above",'b');
+		PF.insert("Which loop is preferrable when number of iterations are known?","while","do..while","for","if",'c');
+		PF.insert("Which is not a type of error in programming?","Compile time error","Run time error","Logical error","System error",'d');
+	}
+	
+	void askQuestions(){
+		PF.display(PF);
+		PF.lives= 3; PF.score= 0;
+	}
+	
+} pf;
+
+void StartScreen(){
+	system("Color B0");
+	cout<<endl<<endl;
+	cout<<endl<<endl;
+	
+	cout<<"   _______  __   __  ___   _______      _______  _______  __   __  _______\n"<< 
+	"  |       ||  | |  ||   | |       |    |       ||   _   ||  |_|  ||       |\n"<<
+	"  |   _   ||  | |  ||   | |____   |    |    ___||  |_|  ||       ||    ___|\n"<<
+	"  |  | |  ||  |_|  ||   |  ____|  |    |   | __ |       ||       ||   |___ \n"<<
+	"  |  |_|  ||       ||   | | ______|    |   ||  ||       ||       ||    ___|\n"<<
+	"  |       ||       ||   | | |_____     |   |_| ||   _   || ||_|| ||   |___ \n"<<
+	"  |____||_||_______||___| |_______|    |_______||__| |__||_|   |_||_______|\n";
+	
+	cout<< "\n\n\t\t\t\tLOADING"; Sleep(1000); cout<<"."; Sleep(1000); cout<<"."; Sleep(1000); cout<<".\n";
+	Sleep(2000);
+	system("cls");
+}
+
+void Instructions(){
+	system("cls");
+	border();
+	cout<<"\n\n\t\t\t\tINSTRUCTIONS\n"<<"\n In Quiz Game, You will first choose one Category for quiz: \n (1) Data Structures and Algorithms"<<
+	 " (2) Object Oriented Programming\n (3) Programming Fundamentals.\n\n For each category, you will be asked 20 QUESTIONS and will be given FOUR OPTIONS.\n"<<
+	 " All you have to select the right answer.\n"; 
+	cout<<"\n You will have 3 TRIES. You will give up one for a wrong answer.\n";
+	cout<<"\n Each correct answer will have 1 SCORE.\n";
+	cout<<"\n\n\n\n\n\n\n\n\t\t\tGOOD LUCK!!!\n";
+    border();
+    cout<<"\n Press any key to continue...";
+	getch();
+	system("cls");
+}
+
+void MainMenu(){
+	while(1){
+		system("cls");
+		border();
+		cout<< "\n\n\t\t _______________________________________________\n";
+		cout<< "\t\t|\t\t    MAIN MENU\t\t\t|\n\t\t|***********************************************|\n";
+		cout<< "\t\t|\t\t1. Start Game\t\t\t|\n\t\t|\t\t2. View Scores\t\t\t|\n\t\t|\t\t3. Instructions\t\t\t|\n\t\t|\t\t4. Quit\t\t\t\t|";
+		cout<< "\n\t\t|_______________________________________________|\n";
+		cout<< "\n\t\tPress any key from 1 to 4.\n\t\t";
+		option= getch();
+		
+		switch(option){
+			case '1': ChooseCategory(); 
+						if(option=='1'){
+							ds.askQuestions();
+						}
+						else if(option=='2'){
+							oop.askQuestions();
+						}
+						else{
+							pf.askQuestions();
+						}
+				break;
+			case '2': ViewScores(); break;
+			case '3': Instructions(); break;
+			case '4': exit(0);
+		}
+	}
+}
+
+void ChooseCategory(){
+	system("cls");
+	border();
+	cout<< "\n\n\t\t _______________________________________________\n";
+	cout<< "\t\t|\t\tCHOOSE CATEGORY\t\t\t|\n\t\t|***********************************************|\n";
+	cout<< "\t\t|\t1. Data Structures and Algorithm\t|\n\t\t|\t2. Object Oriented Programming\t\t|\n\t\t|\t3. Programming Fundamentals\t\t|\n";
+	cout<< "\t\t|_______________________________________________|\n";
+	cout<< "\n\t\tPress any key from 1 to 3.\n\t\t";
+	option= getch();
+	system("cls");
+}
+
+void ViewScores(){
+	system("cls");
+	cout<< "\t***       ALL QUIZZES SCORES      ***\n\n";
+	border();
+	cout<<"\n\tQUIZ\t\t\tSCORE\n";
+	cout<<"_______________________________________\n\n"; 
+	fstream score;
+	score.open("quizscores.dat");
+	string line;
+	while(score){
+		getline(score,line);
+		cout<< "\t"<< line<< endl;
+	}
+	score.close();
+	getch();
+	system("cls");
+}
+	
+int main() {
+	StartScreen();
+	system("Color F0");
+	Instructions();
+	
+	ds.setData();
+	oop.setData();
+	pf.setData();
+	
+	MainMenu(); 
+	return 0;
+}
+
